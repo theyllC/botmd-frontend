@@ -9,4 +9,6 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tool
 export { Separator } from './Separator';
 export { ScrollArea } from './ScrollArea';
 export { Skeleton } from './Skeleton';
+export { Switch } from './Switch';
+export { Label } from './Label';
 export { Toast, ToastProvider, ToastViewport, ToastTitle, ToastDescription, ToastClose, ToastAction } from './Toast';

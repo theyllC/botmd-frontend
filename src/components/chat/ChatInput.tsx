@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip';
 import { Paperclip, Send, X, Mic2 } from 'lucide-react';
 
 interface ChatInputProps {
@@ -48,8 +49,8 @@ export function ChatInput({ onSend, disabled, placeholder = 'Écrivez votre mess
   }, [content]);
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex items-end gap-2 p-3 border-t border-secondary-200 bg-white">
+    <form onSubmit={handleSubmit} className="w-full border-t border-secondary-200/80 glass">
+      <div className="flex items-end gap-2 p-3 sm:p-4 max-w-3xl mx-auto">
         <div className="flex-1 relative">
           <Textarea
             ref={textareaRef}
@@ -58,44 +59,51 @@ export function ChatInput({ onSend, disabled, placeholder = 'Écrivez votre mess
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled || isStreaming}
-            className={cn('pr-12', disabled && 'bg-secondary-50')}
+            aria-label="Message"
+            className={cn('pr-24 !min-h-[48px] resize-none rounded-2xl bg-secondary-100/80', disabled && 'opacity-70')}
             rows={1}
-            style={{ minHeight: '44px', maxHeight: '200px' }}
+            style={{ minHeight: '48px', maxHeight: '200px' }}
           />
-          <div className="absolute bottom-0 right-0 flex items-center gap-1 p-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              disabled={disabled}
-              aria-label="Pièce jointe"
-            >
-              <Paperclip className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              disabled={disabled}
-              aria-label="Microphone"
-            >
-              <Mic2 className="w-4 h-4" />
-            </Button>
+          <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={disabled}
+                  aria-label="Joindre un fichier"
+                >
+                  <Paperclip className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Joindre un fichier</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={disabled}
+                  aria-label="Dicter un message"
+                >
+                  <Mic2 className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Dicter un message</TooltipContent>
+            </Tooltip>
             <Button
               type="submit"
               variant="primary"
               size="icon"
               className="h-8 w-8"
               disabled={!content.trim() || disabled || isStreaming}
-              aria-label="Envoyer"
+              aria-label={isStreaming ? 'Arrêter la génération' : 'Envoyer le message'}
             >
-              {isStreaming ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
+              {isStreaming ? <X className="w-4 h-4" /> : <Send className="w-4 h-4" />}
             </Button>
           </div>
         </div>

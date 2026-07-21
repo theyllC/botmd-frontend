@@ -2,9 +2,8 @@
 
 import { useRef, useEffect } from 'react';
 import { Message } from '@/types/user';
-import { cn } from '@/lib/utils';
 import { MessageBubble } from './MessageBubble';
-import { Loader2, Bot } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { ScrollArea } from '@/components/ui';
 
 interface MessageListProps {
@@ -27,11 +26,13 @@ export function MessageList({ messages, isLoading, isStreaming, onFeedback, scro
 
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-        <Bot className="w-12 h-12 text-secondary-300 mb-4" />
-        <h3 className="text-lg font-medium text-secondary-700">Bienvenue !</h3>
-        <p className="text-secondary-500 mt-1 max-w-xs">
-          Posez-moi vos questions sur l'entreprise, les processus, les avantages, etc.
+      <div className="flex flex-col items-center justify-center h-full py-12 text-center px-4">
+        <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mb-5">
+          <Bot className="w-8 h-8 text-primary-500" />
+        </div>
+        <h3 className="text-lg font-semibold text-secondary-900">Bienvenue !</h3>
+        <p className="text-secondary-500 mt-1.5 max-w-xs text-[15px]">
+          Posez-moi vos questions sur l&apos;entreprise, les processus, les avantages, etc.
         </p>
       </div>
     );
@@ -39,7 +40,7 @@ export function MessageList({ messages, isLoading, isStreaming, onFeedback, scro
 
   return (
     <ScrollArea className="h-full" ref={scrollAreaRef}>
-      <div className="flex flex-col gap-4 p-4 pb-8">
+      <div className="flex flex-col gap-4 p-4 sm:p-6 pb-8 max-w-3xl mx-auto w-full">
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
@@ -49,23 +50,13 @@ export function MessageList({ messages, isLoading, isStreaming, onFeedback, scro
           />
         ))}
 
-        {isStreaming && (
-          <div className={cn('flex gap-3 animate-fade-in', 'justify-start')}>
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary-100 flex items-center justify-center">
-              <Bot className="w-4 h-4 text-secondary-600" />
-            </div>
-            <div className="bg-secondary-50 rounded-2xl rounded-tl-sm px-4 py-3 border border-secondary-200">
-              <div className="flex items-center gap-2 text-secondary-500">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Réflexion en cours...</span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {isLoading && (
-          <div className="flex justify-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+          <div className="flex justify-center py-8" role="status" aria-label="Chargement">
+            <div className="flex gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse-soft [animation-delay:0ms]" />
+              <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse-soft [animation-delay:150ms]" />
+              <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse-soft [animation-delay:300ms]" />
+            </div>
           </div>
         )}
 

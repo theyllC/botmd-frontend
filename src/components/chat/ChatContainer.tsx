@@ -9,9 +9,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { ChatSidebar } from './ChatSidebar';
-import { ScrollArea } from '@/components/ui/ScrollArea';
 import { cn, generateId } from '@/lib/utils';
-import { Loader2, Bot, MessageSquare, X, Paperclip } from 'lucide-react';
+import { Loader2, Bot, MessageSquare, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 
@@ -51,27 +50,28 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
     }
   }, [setChats]);
 
-  const loadChat = useCallback(async (chatId: string) => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/chats/${chatId}`);
-      setCurrentChat(response.data);
-      setMessages(response.data.messages || []);
-    } catch (error) {
-      console.error('Failed to load chat:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [setLoading, setCurrentChat, setMessages]);
+  const loadChat = useCallback(
+    async (chatId: string) => {
+      setLoading(true);
+      try {
+        const response = await api.get(`/chats/${chatId}`);
+        setCurrentChat(response.data);
+        setMessages(response.data.messages || []);
+      } catch (error) {
+        console.error('Failed to load chat:', error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [setLoading, setCurrentChat, setMessages]
+  );
 
-  // Load chats on mount
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       loadChats();
     }
   }, [isAuthenticated, authLoading, loadChats]);
 
-  // Load initial chat if provided
   useEffect(() => {
     if (initialChatId && isAuthenticated && !authLoading) {
       loadChat(initialChatId);
@@ -103,8 +103,6 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
     if (!confirm('Supprimer cette conversation ?')) return;
     try {
       await api.delete(`/chats/${chatId}`);
-      // Remove from store
-      // ... handle removal
       if (currentChatId === chatId) {
         clearCurrentChat();
         router.push('/chat');
@@ -119,7 +117,6 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
 
     setStreaming(true);
 
-    // Add user message optimistically
     const userMessageId = generateId();
     const userMessage: Message = {
       id: userMessageId,
@@ -136,7 +133,6 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
     addMessage(userMessage);
 
     try {
-      // Create streaming response placeholder
       const assistantMessageId = generateId();
       const assistantMessage: Message = {
         id: assistantMessageId,
@@ -152,12 +148,9 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
       };
       addMessage(assistantMessage);
 
-      // Send to backend via WebSocket or streaming API
-      // For now, use regular API and simulate streaming
       const response = await api.post(`/chats/${currentChatId}/messages`, { content });
       const assistantResponse = response.data;
 
-      // Update assistant message with real response
       updateMessage(assistantMessageId, {
         content: assistantResponse.content,
         sources: assistantResponse.sources || [],
@@ -168,7 +161,6 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
       });
     } catch (error) {
       console.error('Failed to send message:', error);
-      // Show error message
     } finally {
       setStreaming(false);
     }
@@ -195,20 +187,22 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-50">
-        <Loader2 className="w-10 h-10 text-primary-600 animate-spin" />
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-50">
-        <div className="text-center">
-          <MessageSquare className="w-16 h-16 text-secondary-300 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-secondary-700">Connexion requise</h2>
+      <div className="flex-1 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-5">
+            <MessageSquare className="w-8 h-8 text-primary-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-secondary-900">Connexion requise</h2>
           <p className="text-secondary-500 mt-2">Veuillez vous connecter pour accéder au chat.</p>
-          <Button className="mt-4" onClick={() => router.push('/login')}>
+          <Button className="mt-5" onClick={() => router.push('/login')}>
             Se connecter
           </Button>
         </div>
@@ -217,32 +211,28 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
-      {/* Mobile Sidebar Overlay */}
+    <div className="flex-1 flex min-h-0 bg-white">
       {showMobileSidebar && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-secondary-900/30 backdrop-blur-sm lg:hidden"
           onClick={() => setShowMobileSidebar(false)}
           aria-hidden="true"
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
-          'fixed lg:static inset-y-0 left-0 z-50 w-80 bg-white border-r border-secondary-200 transform transition-transform duration-300 lg:translate-x-0',
+          'fixed lg:static inset-y-0 left-0 z-50 w-80 bg-secondary-50/70 lg:bg-secondary-50/40 border-r border-secondary-200/80 transform transition-transform duration-300 ease-out lg:translate-x-0',
           showMobileSidebar ? 'translate-x-0' : '-translate-x-full'
         )}
         aria-label="Conversations"
       >
         <div className="flex h-full flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-secondary-200">
-            <h2 className="text-lg font-semibold text-secondary-900">Conversations</h2>
+          <div className="flex items-center justify-between p-4 border-b border-secondary-200/80 lg:hidden">
+            <h2 className="text-base font-semibold text-secondary-900">Conversations</h2>
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
               onClick={() => setShowMobileSidebar(false)}
               aria-label="Fermer"
             >
@@ -250,79 +240,48 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
             </Button>
           </div>
 
-          {/* New Chat Button */}
-          <div className="p-4 border-b border-secondary-200">
-            <Button
-              className="w-full justify-start gap-2"
-              onClick={handleNewChat}
-              leftIcon={<MessageSquare className="w-4 h-4" />}
-            >
-              Nouvelle conversation
-            </Button>
-          </div>
-
-          {/* Chat List */}
-          <ScrollArea className="flex-1">
-            <ChatSidebar
-              chats={chats}
-              currentChatId={currentChatId}
-              onSelectChat={handleSelectChat}
-              onNewChat={handleNewChat}
-              onDeleteChat={handleDeleteChat}
-              isLoading={isLoading}
-            />
-          </ScrollArea>
+          <ChatSidebar
+            chats={chats}
+            currentChatId={currentChatId}
+            onSelectChat={handleSelectChat}
+            onNewChat={handleNewChat}
+            onDeleteChat={handleDeleteChat}
+            isLoading={isLoading}
+          />
         </div>
       </aside>
 
-      {/* Main Chat Area */}
-      <main className="flex-1 lg:ml-0 flex flex-col min-w-0">
-        {/* Mobile Header */}
-        <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-secondary-200">
+      <main className="flex-1 flex flex-col min-w-0 min-h-0">
+        <header className="lg:hidden sticky top-0 z-30 glass border-b border-secondary-200/80">
           <div className="flex items-center justify-between h-16 px-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setShowMobileSidebar(true)}
-              aria-label="Ouvrir le menu"
+              aria-label="Ouvrir les conversations"
             >
               <MessageSquare className="w-5 h-5" />
             </Button>
-            <div className="flex-1 text-center">
-              <h1 className="font-medium text-secondary-900">
-                {currentChatId ? 'Conversation' : 'BoTMD'}
-              </h1>
-            </div>
+            <h1 className="font-medium text-secondary-900">{currentChatId ? 'Conversation' : 'BoTMD'}</h1>
             <div className="w-10" />
           </div>
         </header>
 
-        {/* Chat Header (Desktop) */}
-        <header className="hidden lg:sticky lg:top-0 z-20 bg-white/95 backdrop-blur border-b border-secondary-200">
-          <div className="flex items-center justify-between h-16 px-6">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-primary-600" />
+        <header className="hidden lg:flex sticky top-0 z-20 glass border-b border-secondary-200/80">
+          <div className="flex items-center justify-between h-16 px-6 w-full">
+            <div className="flex items-center gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-sm">
+                <Bot className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-secondary-900">BoTMD</h1>
-                <p className="text-xs text-secondary-500">Assistant d'onboarding</p>
+                <h1 className="text-[15px] font-semibold text-secondary-900 leading-tight">BoTMD</h1>
+                <p className="text-xs text-secondary-500">Assistant d&apos;onboarding</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="h-9 w-9">
-                <Paperclip className="w-4 h-4" />
-              </Button>
-              <Avatar
-                src={user?.avatar_url}
-                fallback={user?.full_name}
-                size="sm"
-              />
-            </div>
+            <Avatar src={user?.avatar_url} fallback={user?.full_name} size="sm" />
           </div>
         </header>
 
-        {/* Messages Area */}
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
           <MessageList
             messages={messages}
@@ -332,22 +291,11 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
             scrollToBottom={true}
           />
 
-          {/* Typing Indicator */}
-          {isStreaming && (
-            <div className="px-4 py-3 border-t border-secondary-200 bg-white/95 backdrop-blur">
-              <div className="flex items-center gap-2 text-secondary-500">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">L'assistant réfléchit...</span>
-              </div>
-            </div>
-          )}
-
-          {/* Input Area */}
           <ChatInput
             onSend={handleSendMessage}
             disabled={!currentChatId || isStreaming}
             isStreaming={isStreaming}
-            placeholder={currentChatId ? 'Posez votre question...' : 'Sélectionnez ou créez une conversation'}
+            placeholder={currentChatId ? 'Posez votre question…' : 'Sélectionnez ou créez une conversation'}
           />
         </div>
       </main>

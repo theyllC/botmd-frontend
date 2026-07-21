@@ -4,7 +4,27 @@ import { useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
-import { Loader2, Settings, KeyRound, Globe, LogOut, Check, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Switch } from '@/components/ui/Switch';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { Loader2, Settings, KeyRound, Globe, Bell, LogOut, Check, AlertCircle } from 'lucide-react';
+
+type StatusState = { type: 'success' | 'error'; message: string };
+
+function StatusBanner({ status }: { status: StatusState }) {
+  return (
+    <div
+      role="status"
+      className={`flex items-center gap-2 p-3 rounded-xl text-sm ${
+        status.type === 'success' ? 'bg-success-50 text-success-700' : 'bg-error-50 text-error-700'
+      }`}
+    >
+      {status.type === 'success' ? <Check className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+      {status.message}
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { user, updateUser, logout, isLoading: authLoading } = useAuthStore();
@@ -14,16 +34,19 @@ export default function SettingsPage() {
     confirm_password: '',
   });
   const [savingPw, setSavingPw] = useState(false);
-  const [pwStatus, setPwStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [pwStatus, setPwStatus] = useState<StatusState | null>(null);
 
   const [locale, setLocale] = useState(user?.locale ?? 'fr');
   const [savingLocale, setSavingLocale] = useState(false);
-  const [localeStatus, setLocaleStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [localeStatus, setLocaleStatus] = useState<StatusState | null>(null);
+
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [productUpdates, setProductUpdates] = useState(false);
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-50">
-        <Loader2 className="w-10 h-10 text-primary-600 animate-spin" />
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
       </div>
     );
   }
@@ -74,116 +97,150 @@ export default function SettingsPage() {
     }
   };
 
-  const StatusBanner = ({ status }: { status: { type: 'success' | 'error'; message: string } }) => (
-    <div
-      className={`flex items-center gap-2 p-3 rounded-lg text-sm ${
-        status.type === 'success' ? 'bg-success-50 text-success-700' : 'bg-error-50 text-error-700'
-      }`}
-    >
-      {status.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-      {status.message}
-    </div>
-  );
-
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-secondary-900 flex items-center gap-2">
-          <Settings className="w-6 h-6 text-primary-600" />
+      <div className="mb-8">
+        <h1 className="text-[28px] font-semibold tracking-tight text-secondary-900 flex items-center gap-2.5">
+          <Settings className="w-7 h-7 text-primary-500" />
           Paramètres
         </h1>
-        <p className="text-secondary-500 mt-1">Gérez la sécurité et les préférences de votre compte.</p>
+        <p className="text-secondary-500 mt-1.5 text-[15px]">Gérez la sécurité et les préférences de votre compte.</p>
       </div>
 
       <div className="space-y-6">
-        {/* Sécurité */}
-        <section className="bg-white rounded-2xl border border-secondary-200 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 flex items-center gap-2 mb-4">
-            <KeyRound className="w-5 h-5 text-primary-600" />
-            Sécurité
-          </h2>
-          {pwStatus && <div className="mb-4"><StatusBanner status={pwStatus} /></div>}
-          <form onSubmit={handlePwSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1.5">Mot de passe actuel</label>
-              <input
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary-500" />
+              Sécurité
+            </CardTitle>
+            <CardDescription>Modifiez votre mot de passe régulièrement pour sécuriser votre compte.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {pwStatus && (
+              <div className="mb-4">
+                <StatusBanner status={pwStatus} />
+              </div>
+            )}
+            <form onSubmit={handlePwSubmit} className="space-y-4">
+              <Input
+                label="Mot de passe actuel"
                 type="password"
                 name="current_password"
+                autoComplete="current-password"
                 value={passwordForm.current_password}
                 onChange={handlePwChange}
-                className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1.5">Nouveau mot de passe</label>
-                <input
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Nouveau mot de passe"
                   type="password"
                   name="new_password"
+                  autoComplete="new-password"
                   value={passwordForm.new_password}
                   onChange={handlePwChange}
-                  className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  helperText="8 caractères minimum"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1.5">Confirmer le mot de passe</label>
-                <input
+                <Input
+                  label="Confirmer le mot de passe"
                   type="password"
                   name="confirm_password"
+                  autoComplete="new-password"
                   value={passwordForm.confirm_password}
                   onChange={handlePwChange}
-                  className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
+              <div className="flex justify-end">
+                <Button type="submit" isLoading={savingPw} variant="secondary">
+                  {savingPw ? 'Modification...' : 'Changer le mot de passe'}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-primary-500" />
+              Préférences
+            </CardTitle>
+            <CardDescription>Personnalisez votre expérience sur la plateforme.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {localeStatus && (
+              <div className="mb-4">
+                <StatusBanner status={localeStatus} />
+              </div>
+            )}
+            <form onSubmit={handleLocaleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="locale-select">Langue de l&apos;interface</Label>
+                <select
+                  id="locale-select"
+                  value={locale}
+                  onChange={(e) => setLocale(e.target.value)}
+                  className="mt-1.5 w-full rounded-xl border border-secondary-200 bg-secondary-50 px-4 py-2.5 text-[15px] text-secondary-900 transition-all duration-200 ease-out focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                >
+                  <option value="fr">Français</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" isLoading={savingLocale}>
+                  {savingLocale ? 'Enregistrement...' : 'Enregistrer les préférences'}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary-500" />
+              Notifications
+            </CardTitle>
+            <CardDescription>Choisissez les notifications que vous souhaitez recevoir.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between py-1">
+              <div className="pr-4">
+                <Label htmlFor="email-notifs" className="text-secondary-900">
+                  Notifications par e-mail
+                </Label>
+                <p className="text-xs text-secondary-500 mt-0.5">Recevez un résumé de vos conversations importantes.</p>
+              </div>
+              <Switch id="email-notifs" checked={emailNotifs} onCheckedChange={setEmailNotifs} aria-label="Notifications par e-mail" />
             </div>
-            <div className="flex justify-end">
-              <Button type="submit" isLoading={savingPw} variant="secondary">
-                {savingPw ? 'Modification...' : 'Changer le mot de passe'}
+            <div className="flex items-center justify-between py-1">
+              <div className="pr-4">
+                <Label htmlFor="product-updates" className="text-secondary-900">
+                  Nouveautés produit
+                </Label>
+                <p className="text-xs text-secondary-500 mt-0.5">Soyez informé des nouvelles fonctionnalités de BoTMD.</p>
+              </div>
+              <Switch id="product-updates" checked={productUpdates} onCheckedChange={setProductUpdates} aria-label="Nouveautés produit" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Session</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-secondary-700">Déconnexion</p>
+                <p className="text-xs text-secondary-500 mt-0.5">Vous serez redirigé vers la page de connexion.</p>
+              </div>
+              <Button variant="destructive" leftIcon={<LogOut className="w-4 h-4" />} onClick={logout}>
+                Se déconnecter
               </Button>
             </div>
-          </form>
-        </section>
-
-        {/* Préférences */}
-        <section className="bg-white rounded-2xl border border-secondary-200 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 flex items-center gap-2 mb-4">
-            <Globe className="w-5 h-5 text-primary-600" />
-            Préférences
-          </h2>
-          {localeStatus && <div className="mb-4"><StatusBanner status={localeStatus} /></div>}
-          <form onSubmit={handleLocaleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1.5">Langue de l'interface</label>
-              <select
-                value={locale}
-                onChange={(e) => setLocale(e.target.value)}
-                className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-              </select>
-            </div>
-            <div className="flex justify-end">
-              <Button type="submit" isLoading={savingLocale}>
-                {savingLocale ? 'Enregistrement...' : 'Enregistrer les préférences'}
-              </Button>
-            </div>
-          </form>
-        </section>
-
-        {/* Session */}
-        <section className="bg-white rounded-2xl border border-secondary-200 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">Session</h2>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-secondary-700">Déconnexion</p>
-              <p className="text-xs text-secondary-500 mt-0.5">Vous serez redirigé vers la page de connexion.</p>
-            </div>
-            <Button variant="destructive" leftIcon={<LogOut className="w-4 h-4" />} onClick={logout}>
-              Se déconnecter
-            </Button>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

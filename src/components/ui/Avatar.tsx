@@ -16,7 +16,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
       sm: 'w-8 h-8 text-xs',
       md: 'w-10 h-10 text-sm',
       lg: 'w-12 h-12 text-base',
-      xl: 'w-16 h-16 text-lg',
+      xl: 'w-20 h-20 text-2xl',
     };
 
     const [imageError, setImageError] = React.useState(false);
@@ -25,7 +25,11 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
       return (
         <div
           ref={ref}
-          className={cn('relative inline-flex shrink-0 overflow-hidden rounded-full', sizes[size], className)}
+          className={cn(
+            'relative inline-flex shrink-0 overflow-hidden rounded-full ring-1 ring-black/5',
+            sizes[size],
+            className
+          )}
           {...props}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -52,7 +56,8 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
       <div
         ref={ref}
         className={cn(
-          'inline-flex items-center justify-center rounded-full bg-primary-100 text-primary-700 font-medium',
+          'inline-flex items-center justify-center rounded-full font-semibold text-white ring-1 ring-black/5',
+          'bg-gradient-to-br from-primary-400 to-primary-600',
           sizes[size],
           className
         )}

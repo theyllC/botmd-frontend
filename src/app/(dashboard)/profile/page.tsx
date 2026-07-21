@@ -5,6 +5,10 @@ import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/lib/api';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Loader2, User, Shield, Mail, Building, Briefcase, Check, AlertCircle } from 'lucide-react';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -26,8 +30,8 @@ export default function ProfilePage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-secondary-50">
-        <Loader2 className="w-10 h-10 text-primary-600 animate-spin" />
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
       </div>
     );
   }
@@ -45,7 +49,7 @@ export default function ProfilePage() {
       const payload: Record<string, unknown> = {};
       (Object.keys(form) as Array<keyof typeof form>).forEach((key) => {
         const value = form[key];
-        const original = (user as Record<string, unknown>)[key];
+        const original = (user as unknown as Record<string, unknown>)[key];
         if (value !== (original ?? '')) {
           payload[key] = value;
         }
@@ -63,112 +67,93 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-secondary-900 flex items-center gap-2">
-          <User className="w-6 h-6 text-primary-600" />
+      <div className="mb-8">
+        <h1 className="text-[28px] font-semibold tracking-tight text-secondary-900 flex items-center gap-2.5">
+          <User className="w-7 h-7 text-primary-500" />
           Mon profil
         </h1>
-        <p className="text-secondary-500 mt-1">Gérez vos informations personnelles.</p>
+        <p className="text-secondary-500 mt-1.5 text-[15px]">Gérez vos informations personnelles.</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-secondary-200 shadow-sm overflow-hidden">
-        {/* En-tête du profil */}
-        <div className="flex items-center gap-4 p-6 bg-secondary-50 border-b border-secondary-200">
+      <Card variant="glass" className="overflow-hidden mb-6">
+        <div className="flex items-center gap-5 p-6 sm:p-8 bg-gradient-to-br from-primary-50/60 to-white">
           <Avatar src={user.avatar_url} fallback={user.full_name} size="xl" />
           <div className="min-w-0">
-            <p className="text-lg font-semibold text-secondary-900 truncate">{user.full_name}</p>
-            <p className="text-sm text-secondary-500 truncate flex items-center gap-1">
-              <Mail className="w-4 h-4" />
+            <p className="text-xl font-semibold text-secondary-900 truncate">{user.full_name}</p>
+            <p className="text-sm text-secondary-500 truncate flex items-center gap-1.5 mt-1">
+              <Mail className="w-3.5 h-3.5" />
               {user.email}
             </p>
-            <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-700">
-              <Shield className="w-3.5 h-3.5" />
+            <Badge variant="primary" className="mt-3 gap-1">
+              <Shield className="w-3 h-3" />
               {ROLE_LABELS[user.role] ?? user.role}
-            </span>
+            </Badge>
           </div>
         </div>
+      </Card>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {status && (
-            <div
-              className={`flex items-center gap-2 p-3 rounded-lg text-sm ${
-                status.type === 'success'
-                  ? 'bg-success-50 text-success-700'
-                  : 'bg-error-50 text-error-700'
-              }`}
-            >
-              {status.type === 'success' ? (
-                <Check className="w-4 h-4" />
-              ) : (
-                <AlertCircle className="w-4 h-4" />
-              )}
-              {status.message}
-            </div>
-          )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Informations personnelles</CardTitle>
+          <CardDescription>Ces informations sont visibles par les administrateurs de votre organisation.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {status && (
+              <div
+                role="status"
+                className={`flex items-center gap-2 p-3 rounded-xl text-sm ${
+                  status.type === 'success' ? 'bg-success-50 text-success-700' : 'bg-error-50 text-error-700'
+                }`}
+              >
+                {status.type === 'success' ? <Check className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+                {status.message}
+              </div>
+            )}
 
-          <div>
-            <label className="block text-sm font-medium text-secondary-700 mb-1.5">Nom complet</label>
-            <input
-              type="text"
-              name="full_name"
-              value={form.full_name}
-              onChange={handleChange}
-              className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
+            <Input label="Nom complet" name="full_name" value={form.full_name} onChange={handleChange} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1.5 flex items-center gap-1.5">
-                <Building className="w-4 h-4 text-secondary-400" />
-                Département
-              </label>
-              <input
-                type="text"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Département"
                 name="department"
                 value={form.department}
                 onChange={handleChange}
                 placeholder="Ex. Ressources Humaines"
-                className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                leftIcon={<Building className="w-4 h-4" />}
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1.5 flex items-center gap-1.5">
-                <Briefcase className="w-4 h-4 text-secondary-400" />
-                Poste
-              </label>
-              <input
-                type="text"
+              <Input
+                label="Poste"
                 name="position"
                 value={form.position}
                 onChange={handleChange}
                 placeholder="Ex. Analyste"
-                className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                leftIcon={<Briefcase className="w-4 h-4" />}
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-secondary-700 mb-1.5">Langue</label>
-            <select
-              name="locale"
-              value={form.locale}
-              onChange={handleChange}
-              className="w-full px-3 py-2.5 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="fr">Français</option>
-              <option value="en">English</option>
-            </select>
-          </div>
+            <div>
+              <Label htmlFor="locale">Langue</Label>
+              <select
+                id="locale"
+                name="locale"
+                value={form.locale}
+                onChange={handleChange}
+                className="mt-1.5 w-full rounded-xl border border-secondary-200 bg-secondary-50 px-4 py-2.5 text-[15px] text-secondary-900 transition-all duration-200 ease-out focus:outline-none focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+              >
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+              </select>
+            </div>
 
-          <div className="flex justify-end pt-2">
-            <Button type="submit" isLoading={saving}>
-              {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
-            </Button>
-          </div>
-        </form>
-      </div>
+            <div className="flex justify-end pt-2">
+              <Button type="submit" isLoading={saving}>
+                {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

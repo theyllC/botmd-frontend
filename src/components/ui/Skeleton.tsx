@@ -8,10 +8,10 @@ export function Skeleton({ className, variant = 'text', ...props }: SkeletonProp
   return (
     <div
       className={cn(
-        'animate-pulse bg-secondary-200 rounded',
+        'shimmer rounded-md',
         variant === 'text' && 'h-4 w-full',
         variant === 'circular' && 'rounded-full',
-        variant === 'rectangular' && 'rounded-lg',
+        variant === 'rectangular' && 'rounded-xl',
         className
       )}
       {...props}

@@ -11,6 +11,7 @@ const inter = Inter({
   display: 'swap',
 });
 
+
 export const metadata: Metadata = {
   title: 'BoTMD - Assistant d\'Onboarding',
   description: 'Chatbot RAG pour l\'onboarding des nouveaux employés',
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#2563eb',
+  themeColor: '#0071e3',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
