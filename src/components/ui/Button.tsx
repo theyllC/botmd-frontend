@@ -25,26 +25,26 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-40 disabled:pointer-events-none active:scale-[0.98]';
+      'inline-flex items-center justify-center gap-1.5 font-medium transition-colors duration-100 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-40 disabled:pointer-events-none';
 
     const variants = {
       primary:
-        'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 focus-visible:ring-primary-500 shadow-sm hover:shadow-md',
+        'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus-visible:ring-primary-500 shadow-sm',
       secondary:
-        'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 active:bg-secondary-300 focus-visible:ring-secondary-400',
+        'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 active:bg-secondary-300 focus-visible:ring-secondary-400 border border-secondary-200',
       ghost:
         'bg-transparent hover:bg-secondary-100 active:bg-secondary-200 focus-visible:ring-secondary-400',
       destructive:
-        'bg-error-500 text-white hover:bg-error-600 active:bg-error-700 focus-visible:ring-error-500 shadow-sm hover:shadow-md',
+        'bg-error-600 text-white hover:bg-error-700 active:bg-error-800 focus-visible:ring-error-500 shadow-sm',
       outline:
         'border border-secondary-300 bg-white hover:bg-secondary-50 active:bg-secondary-100 focus-visible:ring-secondary-400',
     };
 
     const sizes = {
-      sm: 'px-3 py-1.5 text-xs rounded-lg',
-      md: 'px-4 py-2.5 text-sm rounded-xl',
-      lg: 'px-6 py-3 text-base rounded-xl',
-      icon: 'p-2.5 rounded-xl',
+      sm: 'px-2.5 py-1 text-xs rounded-md h-7',
+      md: 'px-3.5 py-1.5 text-[13px] rounded-md h-8',
+      lg: 'px-5 py-2 text-sm rounded-md h-10',
+      icon: 'p-1.5 rounded-md h-8 w-8',
     };
 
     return (

@@ -53,15 +53,15 @@ function NavLink({
       aria-current={isActive ? 'page' : undefined}
       aria-label={collapsed ? item.name : undefined}
       className={cn(
-        'group relative flex items-center rounded-xl text-sm font-medium transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
-        collapsed ? 'h-11 w-11 justify-center mx-auto' : 'h-11 px-3 gap-3',
+        'group relative flex items-center rounded-md text-[13px] font-medium transition-colors duration-150 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
+        collapsed ? 'h-9 w-9 justify-center mx-auto' : 'h-9 px-2.5 gap-2.5',
         isActive ? 'text-primary-600' : 'text-secondary-600 hover:bg-secondary-900/[0.05] hover:text-secondary-900'
       )}
     >
       {isActive && (
         <span
           className={cn(
-            'absolute inset-0 rounded-xl bg-primary-500/10 shadow-[inset_0_0_0_1px_rgba(0,113,227,0.15)] transition-all duration-300 ease-out'
+            'absolute inset-0 rounded-md bg-primary-500/10 shadow-[inset_0_0_0_1px_rgba(76,95,199,0.25)] transition-colors duration-150 ease-out'
           )}
         />
       )}
@@ -158,15 +158,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       />
       <aside
         className={cn(
-          'fixed lg:relative inset-y-0 left-0 z-50 flex-shrink-0 glass-strong lg:bg-secondary-50/70 border-r border-secondary-200/70 flex flex-col',
+          'fixed lg:relative inset-y-0 left-0 z-50 flex-shrink-0 bg-white lg:bg-secondary-50 border-r border-secondary-200 flex flex-col',
           mounted ? 'transition-[width,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]' : '',
-          collapsed ? 'lg:w-[76px]' : 'lg:w-64',
-          'w-64',
+          collapsed ? 'lg:w-[64px]' : 'lg:w-56',
+          'w-56',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         <div className="flex h-full flex-col overflow-hidden">
-          <div className={cn('flex items-center h-16 border-b border-secondary-200/70', collapsed ? 'justify-center px-2' : 'justify-between px-4')}>
+          <div className={cn('flex items-center h-[52px] border-b border-secondary-200/70', collapsed ? 'justify-center px-2' : 'justify-between px-3')}>
             <Link
               href="/chat"
               className={cn(
@@ -174,12 +174,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 collapsed && 'lg:justify-center'
               )}
             >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-sm shadow-primary-500/20 flex-shrink-0">
+              <div className="w-7 h-7 rounded-md bg-primary-700 flex items-center justify-center shadow-sm flex-shrink-0">
                 <Bot className="w-[18px] h-[18px] text-white" />
               </div>
               <span
                 className={cn(
-                  'font-semibold text-[15px] tracking-tight text-secondary-900 whitespace-nowrap transition-all duration-200',
+                  'font-semibold text-[13px] tracking-tight text-secondary-900 whitespace-nowrap transition-all duration-200',
                   collapsed ? 'lg:w-0 lg:opacity-0' : 'w-auto opacity-100'
                 )}
               >
@@ -251,7 +251,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Link
                   href="/profile"
                   onClick={onClose}
-                  className="flex items-center gap-3 px-2 py-2 mb-1 rounded-xl hover:bg-secondary-900/[0.04] transition-colors duration-150"
+                  className="flex items-center gap-3 px-2 py-2 mb-1 rounded-md hover:bg-secondary-900/[0.04] transition-colors duration-150"
                 >
                   <Avatar src={user?.avatar_url} fallback={user?.full_name} size="md" />
                   <div className="flex-1 min-w-0">
@@ -264,7 +264,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     logout();
                     onClose();
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-secondary-600 hover:text-error-600 hover:bg-error-50 transition-colors duration-150"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-medium text-secondary-600 hover:text-error-600 hover:bg-error-50 transition-colors duration-150"
                 >
                   <LogOut className="w-4 h-4" />
                   Déconnexion

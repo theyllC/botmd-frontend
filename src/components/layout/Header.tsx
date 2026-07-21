@@ -22,7 +22,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 glass border-b border-secondary-200/80">
-      <div className="flex h-16 items-center justify-between gap-4 px-4 lg:px-6">
+      <div className="flex h-[52px] items-center justify-between gap-3 px-4 lg:px-5">
         <div className="flex items-center gap-4">
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-secondary-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
@@ -40,7 +40,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               type="search"
               placeholder="Rechercher…"
               aria-label="Rechercher dans l'aide"
-              className="w-full pl-10 pr-4 py-2 bg-secondary-100/80 border border-transparent rounded-full text-sm text-secondary-900 placeholder:text-secondary-400 transition-all duration-200 ease-out focus:outline-none focus:bg-white focus:border-secondary-200 focus:ring-2 focus:ring-primary-500/20"
+              className="w-full pl-9 pr-3 py-1.5 h-8 bg-secondary-100 border border-transparent rounded-md text-[13px] text-secondary-900 placeholder:text-secondary-400 transition-colors duration-150 ease-out focus:outline-none focus:bg-white focus:border-secondary-300 focus:ring-2 focus:ring-primary-500/20"
             />
           </div>
         </div>

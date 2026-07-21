@@ -10,7 +10,7 @@ import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { ChatSidebar } from './ChatSidebar';
 import { cn, generateId } from '@/lib/utils';
-import { Loader2, Bot, MessageSquare, X } from 'lucide-react';
+import { Loader2, Bot, MessageSquare, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 
@@ -39,7 +39,25 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
   } = useChatStore();
 
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [railCollapsed, setRailCollapsed] = useState(false);
+  const [railMounted, setRailMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const RAIL_COLLAPSE_KEY = 'botmd:chat-rail-collapsed';
+
+  useEffect(() => {
+    setRailMounted(true);
+    const stored = typeof window !== 'undefined' ? window.localStorage.getItem(RAIL_COLLAPSE_KEY) : null;
+    if (stored === '1') setRailCollapsed(true);
+  }, []);
+
+  const toggleRailCollapsed = () => {
+    setRailCollapsed((prev) => {
+      const next = !prev;
+      window.localStorage.setItem(RAIL_COLLAPSE_KEY, next ? '1' : '0');
+      return next;
+    });
+  };
 
   const loadChats = useCallback(async () => {
     try {
@@ -222,14 +240,18 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
 
       <aside
         className={cn(
-          'fixed lg:static inset-y-0 left-0 z-50 w-80 bg-secondary-50/70 lg:bg-secondary-50/40 border-r border-secondary-200/80 transform transition-transform duration-300 ease-out lg:translate-x-0',
-          showMobileSidebar ? 'translate-x-0' : '-translate-x-full'
+          'fixed lg:static inset-y-0 left-0 z-50 bg-secondary-50 lg:bg-secondary-50 border-r border-secondary-200 transform lg:translate-x-0 overflow-hidden',
+          railMounted ? 'transition-[width] duration-200 ease-out' : '',
+          'w-80',
+          railCollapsed ? 'lg:w-0 lg:border-r-0' : 'lg:w-72',
+          showMobileSidebar ? 'translate-x-0' : '-translate-x-full transition-transform duration-200 ease-out lg:transition-none'
         )}
         aria-label="Conversations"
+        aria-hidden={railCollapsed && !showMobileSidebar}
       >
-        <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-secondary-200/80 lg:hidden">
-            <h2 className="text-base font-semibold text-secondary-900">Conversations</h2>
+        <div className="flex h-full flex-col w-80 lg:w-72">
+          <div className="flex items-center justify-between p-3 border-b border-secondary-200 lg:hidden">
+            <h2 className="text-sm font-semibold text-secondary-900">Conversations</h2>
             <Button
               variant="ghost"
               size="icon"
@@ -251,9 +273,19 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
         </div>
       </aside>
 
+      {railCollapsed && (
+        <button
+          onClick={toggleRailCollapsed}
+          className="hidden lg:flex items-center justify-center w-6 border-r border-secondary-200 bg-secondary-50 text-secondary-400 hover:text-secondary-700 hover:bg-secondary-100 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-inset flex-shrink-0"
+          aria-label="Afficher les conversations"
+        >
+          <PanelLeftOpen className="w-3.5 h-3.5" />
+        </button>
+      )}
+
       <main className="flex-1 flex flex-col min-w-0 min-h-0">
-        <header className="lg:hidden sticky top-0 z-30 glass border-b border-secondary-200/80">
-          <div className="flex items-center justify-between h-16 px-4">
+        <header className="lg:hidden sticky top-0 z-30 glass border-b border-secondary-200">
+          <div className="flex items-center justify-between h-[52px] px-4">
             <Button
               variant="ghost"
               size="icon"
@@ -262,20 +294,31 @@ export function ChatContainer({ initialChatId }: ChatContainerProps) {
             >
               <MessageSquare className="w-5 h-5" />
             </Button>
-            <h1 className="font-medium text-secondary-900">{currentChatId ? 'Conversation' : 'BoTMD'}</h1>
-            <div className="w-10" />
+            <h1 className="font-medium text-[13px] text-secondary-900">{currentChatId ? 'Conversation' : 'BoTMD'}</h1>
+            <div className="w-9" />
           </div>
         </header>
 
-        <header className="hidden lg:flex sticky top-0 z-20 glass border-b border-secondary-200/80">
-          <div className="flex items-center justify-between h-16 px-6 w-full">
-            <div className="flex items-center gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-sm">
-                <Bot className="w-4 h-4 text-white" />
+        <header className="hidden lg:flex sticky top-0 z-20 glass border-b border-secondary-200">
+          <div className="flex items-center justify-between h-[52px] px-4 w-full">
+            <div className="flex items-center gap-2.5">
+              {!railCollapsed && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleRailCollapsed}
+                  aria-label="Masquer les conversations"
+                  className="mr-1"
+                >
+                  <PanelLeftClose className="w-4 h-4" />
+                </Button>
+              )}
+              <div className="w-7 h-7 rounded-md bg-primary-700 flex items-center justify-center shadow-sm">
+                <Bot className="w-3.5 h-3.5 text-white" />
               </div>
               <div>
-                <h1 className="text-[15px] font-semibold text-secondary-900 leading-tight">BoTMD</h1>
-                <p className="text-xs text-secondary-500">Assistant d&apos;onboarding</p>
+                <h1 className="text-[13px] font-semibold text-secondary-900 leading-tight">BoTMD</h1>
+                <p className="text-[11px] text-secondary-500">Assistant d&apos;onboarding</p>
               </div>
             </div>
             <Avatar src={user?.avatar_url} fallback={user?.full_name} size="sm" />
