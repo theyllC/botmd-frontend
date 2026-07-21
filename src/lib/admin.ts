@@ -3,10 +3,12 @@ import {
   AdminUsersListResponse,
   UserListItem,
   UserUpdateAdmin,
+  UserCreateAdmin,
   SystemStats,
   DocumentListResponse,
   DocumentListItem,
   DocumentStats,
+  LoginHistoryListResponse,
 } from '@/types/admin';
 
 export interface AdminUsersParams {
@@ -20,10 +22,23 @@ export interface AdminUsersParams {
   sort_order?: 'asc' | 'desc';
 }
 
+export interface LoginHistoryParams {
+  page?: number;
+  page_size?: number;
+  user_id?: string;
+  email?: string;
+  success?: boolean;
+}
+
 export const adminApi = {
   // --- Users (admin) ---
   async getUsers(params: AdminUsersParams = {}): Promise<AdminUsersListResponse> {
     const { data } = await api.get<AdminUsersListResponse>('/admin/users', { params });
+    return data;
+  },
+
+  async createUser(payload: UserCreateAdmin): Promise<UserListItem> {
+    const { data } = await api.post<UserListItem>('/admin/users', payload);
     return data;
   },
 
@@ -47,9 +62,30 @@ export const adminApi = {
     return data;
   },
 
+  // --- Login history ---
+  async getLoginHistory(params: LoginHistoryParams = {}): Promise<LoginHistoryListResponse> {
+    const { data } = await api.get<LoginHistoryListResponse>('/admin/login-history', { params });
+    return data;
+  },
+
+  async getUserLoginHistory(userId: string, params: { page?: number; page_size?: number } = {}): Promise<LoginHistoryListResponse> {
+    const { data } = await api.get<LoginHistoryListResponse>(`/admin/users/${userId}/login-history`, { params });
+    return data;
+  },
+
   // --- Documents (admin / RAG) ---
   async getDocuments(params: Record<string, unknown> = {}): Promise<DocumentListResponse> {
     const { data } = await api.get<DocumentListResponse>('/documents', { params });
+    return data;
+  },
+
+  async getDocument(docId: string): Promise<import('@/types/admin').DocumentWithChunks> {
+    const { data } = await api.get(`/documents/${docId}`);
+    return data;
+  },
+
+  async getDocumentChunks(docId: string, params: { page?: number; page_size?: number } = {}): Promise<import('@/types/admin').ChunkResponse[]> {
+    const { data } = await api.get(`/documents/${docId}/chunks`, { params });
     return data;
   },
 

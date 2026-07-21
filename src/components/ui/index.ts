@@ -12,3 +12,4 @@ export { Skeleton } from './Skeleton';
 export { Switch } from './Switch';
 export { Label } from './Label';
 export { Toast, ToastProvider, ToastViewport, ToastTitle, ToastDescription, ToastClose, ToastAction } from './Toast';
+export { Modal } from './Modal';

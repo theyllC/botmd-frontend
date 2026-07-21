@@ -21,6 +21,36 @@ export interface UserUpdateAdmin {
   is_active?: boolean | null;
 }
 
+export interface UserCreateAdmin {
+  email: string;
+  full_name: string;
+  password: string;
+  department?: string | null;
+  position?: string | null;
+  role?: string;
+  is_active?: boolean;
+}
+
+export interface LoginHistoryItem {
+  id: string;
+  user_id: string | null;
+  email: string;
+  success: boolean;
+  method: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  failure_reason: string | null;
+  created_at: string;
+}
+
+export interface LoginHistoryListResponse {
+  items: LoginHistoryItem[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
 export interface AdminUsersListResponse {
   items: UserListItem[];
   total: number;
@@ -74,6 +104,19 @@ export interface DocumentListItem {
   created_at: string;
   indexed_at: string | null;
   updated_at: string | null;
+}
+
+export interface ChunkResponse {
+  id: string;
+  chunk_index: number;
+  content: string;
+  token_count: number;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface DocumentWithChunks extends DocumentListItem {
+  chunks: ChunkResponse[];
 }
 
 export interface DocumentListResponse {
